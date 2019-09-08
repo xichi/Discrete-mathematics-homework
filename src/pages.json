@@ -5,6 +5,30 @@
 			"style": {
 				"navigationBarTitleText": "离散数学实验"
 			}
+		},
+		{
+			"path": "pages/exp/exp1",
+			"style": {
+				"navigationBarTitleText": "离散数学实验一"
+			}
+		},
+		{
+			"path": "pages/exp/exp2",
+			"style": {
+				"navigationBarTitleText": "离散数学实验二"
+			}
+		},
+		{
+			"path": "pages/exp/exp3",
+			"style": {
+				"navigationBarTitleText": "离散数学实验三"
+			}
+		},
+		{
+			"path": "pages/exp/exp4",
+			"style": {
+				"navigationBarTitleText": "离散数学实验四"
+			}
 		}
 	],
 	"globalStyle": {
