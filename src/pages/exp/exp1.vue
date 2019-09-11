@@ -15,8 +15,8 @@ export default{
            combinedFormula:'', //合式公式
            trueValue:[],  //真值（命题变元）,数组长度是变元数量
            infixExp:[],        //存放中缀表达式字符
-           postfixExp:[],      //存放后缀表达式字符（出栈）
            tempExp:[],      //存放临时字符(栈)
+           postfixExp:[],   //存放后缀表达式字符（出栈）
            trueTable:[],  //真值表
            xqfs:[],       //主析取范式   
            hqfs:[],       //主合取范式
@@ -46,13 +46,13 @@ export default{
                 case ')': i = 1; break;
             }
             switch(out){
-                case '(': o = 8; break;
+                case '(': o = 1; break;
                 case '!': o = 2; break;
                 case '&': o = 3; break;
                 case '|': o = 4; break;
                 case '-': o = 6; break;
                 case '<': o = 7; break;
-                case ')': o = 1; break;
+                case ')': o = 8; break;
             }
             if(o < i){
                 return true
@@ -61,7 +61,7 @@ export default{
                 return false
             }
         },
-        infixTopostfix: function(){
+        infixTopostfix: function(){           //中缀表达式转为后缀表达式
             var item
             for (var i = 0; i < this.infixExp.length; i++) {
                 if(this.infixExp[i]>='a' && this.infixExp[i]<='z') { //遇到操作数
@@ -71,7 +71,6 @@ export default{
                        while (this.tempExp.length != 0){
                             item = this.tempExp.pop();
                             if(item === '('){
-                                this.tempExp.pop()
                                 break
                             }
                             this.postfixExp.push(item);
@@ -108,6 +107,37 @@ export default{
            console.log(this.infixExp)
            this.$options.methods.infixTopostfix.bind(this)() 
            console.log(this.postfixExp)
+           
+        },
+        cal:function(postfixExp){       //对赋值后的后缀表达式进行计算
+           var tempExp = []
+           for (var i = 0; i < postfixExp.length; i++) {
+                if (postfixExp[i]>='a' && postfixExp[i]<='z') {
+                    tempExp.push(postfixExp[i]);
+                }
+                else {
+                   
+                    switch (postfixExp[i]) {
+                        case '!':
+                            
+                            break
+                        case '&':
+                            
+                            break
+                        case '|':
+                            
+                            break
+                        case '-':
+                           
+                            break
+                        case '<':
+                           
+                            break
+                        default:
+                            alert("运算符号出错！");
+                    }
+                }
+            }          
         },
         createTrueTable:function(){        //生成真值表
             
