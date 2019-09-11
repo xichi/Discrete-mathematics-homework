@@ -80,11 +80,9 @@ export default{
                 else{ //遇到运算符和'('
                         if (this.tempExp.length == 0) {
                             this.tempExp.push(this.infixExp[i])
-                            console.log('0'+this.tempExp)
                         }
                         else if (this.$options.methods.canInto.bind(this)(this.infixExp[i])) {
                             this.tempExp.push(this.infixExp[i])
-                            console.log('1'+this.tempExp)
                         }
                         else if (!this.$options.methods.canInto.bind(this)(this.infixExp[i])) {
                             while (this.tempExp.length != 0){
