@@ -20,7 +20,6 @@ export default{
         return{
            combinedFormula:'', //合式公式
            trueValue:[],  //真值（命题变元）,数组长度是变元数量
-           trueValueV:[],
            infixExp:[],        //存放中缀表达式字符
            tempExp:[],      //存放临时字符(栈)
            postfixExp:[],   //存放后缀表达式字符（出栈）
@@ -34,7 +33,7 @@ export default{
     },
     methods:{
         createTrueValue:function(){        //统计命题变元,预处理
-            this.infixExp = this.combinedFormula.replace('->','-').replace('<=>','<').split('')
+            this.infixExp = this.combinedFormula.replace(/->/g,'-').replace(/<=>/g,'<').split('')
             var toughtrueValue = this.combinedFormula.split('').filter(item =>{  //未去重的命题变元（真值）
                 return item>='a' && item<='z'
             })               
@@ -110,27 +109,38 @@ export default{
         },
      cal:function(postfixExp,trueTable){       //对赋值后的后缀表达式进行计算
            var tempExp = []
-           var a1 = []
-           var t1,t2
+           var item
+           var t1,t2          
            for (var i = 0; i < postfixExp.length; i++) {
                 if (postfixExp[i]>='a' && postfixExp[i]<='z') {
-                    tempExp.push(postfixExp[i]);
+                   item = postfixExp[i]
+                    for(var j = 0;j < this.trueValue.length;j++){          //把真值表的值赋给命题变元
+                       if(item == this.trueValue[j]){
+                           item = trueTable[j]
+                           tempExp.push(item)
+                           break
+                       }
+                    }
+                    //console.log(postfixExp)
                 }
                 else {
                     switch (postfixExp[i]) {
                         case '!':
                             t1 = tempExp.pop()
-                            tempExp.push(!t1)
+                            if(t1==0)  tempExp.push(1)
+                            else if(t1==1)      tempExp.push(0) 
                             break
                         case '&':
                             t1 = tempExp.pop()
                             t2 = tempExp.pop()
-                            tempExp.push( t1 && t2 )
+                            if(t1==1&&t2==1) tempExp.push(1)
+                            else   tempExp.push(0)
                             break
                         case '|':
                             t1 = tempExp.pop()
                             t2 = tempExp.pop()
-                            tempExp.push( t1 || t2 )
+                            if(t1==0&&t2==0)  tempExp.push(0)
+                            else       tempExp.push(1)
                             break
                         case '-':
                            t1 = tempExp.pop()
@@ -141,7 +151,8 @@ export default{
                         case '<':
                             t1 = tempExp.pop()
                             t2 = tempExp.pop()
-                            tempExp.push( t1 == t2 )
+                            if(t1==t2)  tempExp.push(1)
+                            else       tempExp.push(0)
                             break
                         default:
                             alert("运算符号出错,请重新输入");
@@ -149,12 +160,9 @@ export default{
                 }
             }  
             tempExp = tempExp.toString()
-            if(!tempExp) tempExp = '0'
-            else if(tempExp) tempExp = '1'
+            if(tempExp == 'true') {tempExp = '0'}
+            else if(tempExp == 'false') {tempExp = '1'} 
             return tempExp       
-        },
-        judege:function(){
-            
         },
         createTrueTable:function(){        //生成真值表
             //命题变元赋值
