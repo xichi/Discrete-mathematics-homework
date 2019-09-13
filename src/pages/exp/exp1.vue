@@ -181,16 +181,9 @@ export default{
             //合式公式计算  
                 this.trueTable[j].push(this.$options.methods.cal.bind(this)(this.postfixExp,this.trueTable[j]))      
             }           
+            this.$options.methods.transform.bind(this)()
             console.log('真值表',this.trueTable)          
         }, 
-        calculate:function(){           //合式公式开始计算
-           this.$options.methods.clear.bind(this)() 
-           this.$options.methods.createTrueValue.bind(this)()             //bind(this)可以让this指针回顾正常
-           console.log('中缀表达式'+this.infixExp)
-           this.$options.methods.infixTopostfix.bind(this)() 
-           console.log('后缀表达式'+this.postfixExp)
-           this.$options.methods.createTrueTable.bind(this)()       
-        },
         clear:function(){        //重新加载
            this.tempExp.length = 0
            this.postfixExp.length = 0
@@ -199,7 +192,70 @@ export default{
            this.trueTable.length = 0
            this.xqfs.length = 0 
            this.hqfs.length = 0
-        }
+        },
+        transform: function(){         //把0转化成F,把1转化成T
+            for(var a=0;a<this.trueTable.length;a++){
+                for(var b=0;b<this.trueTable[a].length;b++){
+                      if(this.trueTable[a][b] == '1')  this.trueTable[a][b] = 'T'
+                      else if(this.trueTable[a][b] == '0')  this.trueTable[a][b] = 'F'
+                }
+            }
+        },
+        createXqfs:function(){        //析取范式，T的指派
+           var item = []
+           for(var a=0;a<this.trueTable.length;a++){
+               if(this.trueTable[a][this.trueValue.length] == 'T'){
+                   item.push('(')
+                   for(var b=0;b<(this.trueTable[a].length-1);b++){
+                       if(this.trueTable[a][b] == 'T'){
+                            item.push(this.trueValue[b])     
+                       }  
+                       else if(this.trueTable[a][b] == 'F'){
+                            item.push('┐'+this.trueValue[b])
+                       }
+                       item.push('∧')
+                   }
+                   item.pop()
+                   item.push(')')
+                   item.push('∨')
+               }
+           }
+           item.pop()
+           console.log('主析取范式:'+item.join('')) 
+        },
+        createHqfs:function(){       //合取范式，F的指派
+           var item = []
+           for(var a=0;a<this.trueTable.length;a++){
+               if(this.trueTable[a][this.trueValue.length] == 'F'){
+                   item.push('(')
+                   for(var b=0;b<(this.trueTable[a].length-1);b++){
+                       if(this.trueTable[a][b] == 'F'){
+                            item.push(this.trueValue[b])     
+                       }  
+                       else if(this.trueTable[a][b] == 'T'){
+                            item.push('┐'+this.trueValue[b])
+                       }
+                       item.push('∨')
+                   }
+                   item.pop()
+                   item.push(')')
+                   item.push('∧')
+               }
+           }
+           item.pop()
+           console.log('主合取范式:'+item.join('')) 
+        },
+        calculate:function(){           //合式公式开始计算
+           this.$options.methods.clear.bind(this)() 
+           this.$options.methods.createTrueValue.bind(this)()             //bind(this)可以让this指针回顾正常
+           console.log('中缀表达式'+this.infixExp)
+           this.$options.methods.infixTopostfix.bind(this)() 
+           console.log('后缀表达式'+this.postfixExp)
+           this.$options.methods.createTrueTable.bind(this)()
+           this.$options.methods.createXqfs.bind(this)()
+           this.$options.methods.createHqfs.bind(this)()
+           //console.log(this.trueTable.length)       
+        },
     }
 }
 </script>
