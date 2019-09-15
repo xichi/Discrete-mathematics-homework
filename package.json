@@ -33,6 +33,7 @@
     "@dcloudio/uni-mp-toutiao": "^2.0.0-22420190823019",
     "@dcloudio/uni-mp-weixin": "^2.0.0-22420190823019",
     "@dcloudio/uni-stat": "^2.0.0-22420190823019",
+    "element-ui": "^2.12.0",
     "flyio": "^0.6.2",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",

@@ -4,13 +4,32 @@
         <text>请输入表达式(或运算 | , 与运算 & ,单条件 -> ,双条件 <=> ,非运算 !):</text>
         <input class="uni-input" @focus="combinedFormula='(p->q)&(q|r)<=>!r'" placeholder="示例：(p->q)&(q|r)<=>!r" v-model="combinedFormula"/>
         <button type="primary" size="mini" @tap="calculate">确定</button>
-        <form action="">        
-            <ol v-for="item in trueValue" :key="item.id"></ol>
-            <ul>
-                <li></li>
-            </ul>
-        </form>
         <!-- 方式二：输入可视化 -->
+        <!-- 输出结果 -->
+        <view v-show="trueValue.length != 0">
+            <el-table
+                :data="trueTableObj"
+                height="400"
+                style="width: 95%"
+                border
+                stripe
+                >
+                <el-table-column
+                v-for="item in trueValue"
+                :key="item.id"
+                :prop="item"
+                :label="item"
+                width="90">
+                </el-table-column>
+                <el-table-column
+                :prop="trueCombinedFormula"
+                :label="trueCombinedFormula"
+                width="90">
+                </el-table-column>
+            </el-table>
+            <view>主析取范式：{{xqfs}}</view>
+            <view>主合取范式：{{hqfs}}</view>
+        </view>
     </view>
 </template>
 
@@ -19,13 +38,15 @@ export default{
     data(){
         return{
            combinedFormula:'', //合式公式
+           trueCombinedFormula:'', //为了element的UI好看
            trueValue:[],  //真值（命题变元）,数组长度是变元数量
            infixExp:[],        //存放中缀表达式字符
            tempExp:[],      //存放临时字符(栈)
            postfixExp:[],   //存放后缀表达式字符（出栈）
            trueTable:[],  //真值表
-           xqfs:[],       //主析取范式   
-           hqfs:[],       //主合取范式
+           trueTableObj:[],  //为了element的组件而修改的真值表
+           xqfs:'',       //主析取范式   
+           hqfs:'',       //主合取范式
         }
     },
     mounted(){
@@ -35,7 +56,7 @@ export default{
         createTrueValue:function(){        //统计命题变元,预处理
             this.infixExp = this.combinedFormula.replace(/->/g,'-').replace(/<=>/g,'<').split('')
             var toughtrueValue = this.combinedFormula.split('').filter(item =>{  //未去重的命题变元（真值）
-                return item>='a' && item<='z'
+                return item>='a' && item<='z' || item>='A' && item<='Z'
             })               
             this.trueValue = [...new Set(toughtrueValue)]            //去重的命题变元
             console.log('命题变元'+this.trueValue) 
@@ -71,7 +92,7 @@ export default{
         infixTopostfix: function(){           //中缀表达式转为后缀表达式
             var item
             for (var i = 0; i < this.infixExp.length; i++) {
-                if(this.infixExp[i]>='a' && this.infixExp[i]<='z') { //遇到操作数
+                if(this.infixExp[i]>='a' && this.infixExp[i]<='z' || this.infixExp[i]>='A' && this.infixExp[i]<='Z' ) { //遇到操作数
                     this.postfixExp.push(this.infixExp[i])
                 }
                 else if(this.infixExp[i] === ')' ){       //遇到右括号
@@ -112,7 +133,7 @@ export default{
            var item
            var t1,t2          
            for (var i = 0; i < postfixExp.length; i++) {
-                if (postfixExp[i]>='a' && postfixExp[i]<='z') {
+                if (postfixExp[i]>='a' && postfixExp[i]<='z' || postfixExp[i]>='A' && postfixExp[i]<='Z') {
                    item = postfixExp[i]
                     for(var j = 0;j < this.trueValue.length;j++){          //把真值表的值赋给命题变元
                        if(item == this.trueValue[j]){
@@ -154,8 +175,6 @@ export default{
                             if(t1==t2)  tempExp.push(1)
                             else       tempExp.push(0)
                             break
-                        default:
-                            alert("运算符号出错,请重新输入");
                     }
                 }
             }  
@@ -190,8 +209,8 @@ export default{
            this.trueValue.length = 0
            this.infixExp.length = 0
            this.trueTable.length = 0
-           this.xqfs.length = 0 
-           this.hqfs.length = 0
+           this.xqfs = ''
+           this.hqfs = ''
         },
         transform: function(){         //把0转化成F,把1转化成T
             for(var a=0;a<this.trueTable.length;a++){
@@ -221,7 +240,8 @@ export default{
                }
            }
            item.pop()
-           console.log('主析取范式:'+item.join('')) 
+           this.xqfs = item.join('')
+           console.log('主析取范式:'+this.xqfs) 
         },
         createHqfs:function(){       //合取范式，F的指派
            var item = []
@@ -243,9 +263,11 @@ export default{
                }
            }
            item.pop()
-           console.log('主合取范式:'+item.join('')) 
+           this.hqfs = item.join('')
+           console.log('主合取范式:'+this.hqfs) 
         },
         calculate:function(){           //合式公式开始计算
+           this.trueCombinedFormula = this.combinedFormula
            this.$options.methods.clear.bind(this)() 
            this.$options.methods.createTrueValue.bind(this)()             //bind(this)可以让this指针回顾正常
            console.log('中缀表达式'+this.infixExp)
@@ -254,12 +276,30 @@ export default{
            this.$options.methods.createTrueTable.bind(this)()
            this.$options.methods.createXqfs.bind(this)()
            this.$options.methods.createHqfs.bind(this)()
+           this.$options.methods.UItransform.bind(this)()
            //console.log(this.trueTable.length)       
+        },
+        UItransform:function(){      //为了迎合element的表格，修改数组结构
+           var objArray = []
+           var trueValue = this.trueValue
+           var trueTable = this.trueTable
+           var trueCombinedFormula = this.trueCombinedFormula
+           for(var i=0;i<trueTable.length;i++){
+               var obj = {}
+               for(var j=0;j<trueValue.length;j++){
+                    obj[trueValue[j]] = trueTable[i][j]
+               }
+               obj[trueCombinedFormula] = trueTable[i][j]
+               objArray.push(obj)
+           }
+           this.trueTableObj = objArray   
         },
     }
 }
 </script>
 
-<style lang="less" scoped>
-
+<style>
+ .el-table{
+     margin:0 auto
+ }
 </style>
