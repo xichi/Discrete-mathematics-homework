@@ -66,24 +66,24 @@ export default{
             var into = this.tempExp[this.tempExp.length-1]
             var i = 0, o = 0
             switch(into){     //栈内
-                case '(': o = 12; break;
-                case '!': o = 3; break;
-                case '&': o = 5; break;
-                case '|': o = 7; break;
-                case '-': o = 9; break;
-                case '<': o = 11; break;
-                case ')': o = 1; break; 
+                case '(': i = 12; break;
+                case '!': i = 3; break;
+                case '&': i = 5; break;
+                case '|': i = 7; break;
+                case '-': i = 9; break;
+                case '<': i = 11; break;
+                case ')': i = 1; break; 
             }
             switch(out){      //栈外
-                case '(': i = 1; break;
-                case '!': i = 2; break;
-                case '&': i = 4; break;
-                case '|': i = 6; break;
-                case '-': i = 8; break;
-                case '<': i = 10; break;
-                case ')': i = 12; break; 
+                case '(': o = 1; break;
+                case '!': o = 2; break;
+                case '&': o = 4; break;
+                case '|': o = 6; break;
+                case '-': o = 8; break;
+                case '<': o = 10; break;
+                case ')': o = 12; break; 
             }
-            if(o > i){
+            if(i > o){      //栈外优先级大于栈内
                 return true
             }
             else{
