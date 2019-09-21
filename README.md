@@ -1,29 +1,9 @@
 # discrete-mathematics-homework
 
-## Project setup
-```
-yarn install
-```
+基于uni-app的移动端开发。
 
-### Compiles and hot-reloads for development
-```
-yarn run serve
-```
-
-### Compiles and minifies for production
-```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 目标：
+1. 封装函数。
+2. 界面优化，增加输入选择性。
+3. 借此机会，多多使用炫酷动画效果
+4. 可能的话，在完成实验后，将可用的组件拿出（同时新增功能），写一个离散数学小工具的APP。
