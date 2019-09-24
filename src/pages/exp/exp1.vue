@@ -2,8 +2,13 @@
     <view>
         <!-- 方式一：直接输入 -->
         <text class='tips'>请输入表达式:<span>(或运算 | , 与运算 & ,单条件 -> ,双条件 <=> ,非运算 !)</span></text>
-        <el-input v-model="combinedFormula" placeholder="示例：(((!!!p|q)<=>(a&b))->(r|(!b&c))"  @focus="combinedFormula='((!!!p|q)<=>(a&b))->(r|(!b&c))'" class="CFinput" @keypress="createTable"></el-input>
-        <el-button class="checkbutton" type="primary" icon="el-icon-check" circle @tap="calculate"  size="small"></el-button>
+        <view style="overflow:hidden;">
+            <el-input v-model="combinedFormula" placeholder="示例：((!!!p|q)<=>(a&b))->(r|(!b&c))"  @focus="combinedFormula='((!!!p|q)<=>(a&b))->(r|(!b&c))'" class="CFinput" @keypress="createTable" clearable prefix-icon="el-icon-edit">
+            </el-input>
+            <view class="mybutton" :animation="animationButton">
+                <el-button class="checkbutton" type="primary" icon="el-icon-check" circle @tap="calculate"  size="small"></el-button>
+            </view>
+        </view>
         <!-- 方式二：输入可视化 -->
         <!-- 输出结果 -->
         <el-card class="box-card" v-show="trueValue.length != 0">
@@ -48,6 +53,7 @@ export default{
            trueTableObj:[],  //为了element的组件而修改的真值表
            xqfs:'',       //主析取范式   
            hqfs:'',       //主合取范式
+           animationButton: {}, //button的动画
         }
     },
     mounted(){
@@ -96,9 +102,6 @@ export default{
                 if(this.infixExp[i]>='a' && this.infixExp[i]<='z' || this.infixExp[i]>='A' && this.infixExp[i]<='Z' ) { //遇到操作数
                     this.postfixExp.push(this.infixExp[i])
                 }
-                /* else if(this.infixExp[i] === '(' ){       //遇到左括号
-                       this.tempExp.push(this.infixExp[i])
-                } */
                 else if(this.infixExp[i] === ')' ){       //遇到右括号
                        while (this.tempExp.length != 0){
                             item = this.tempExp.pop();
@@ -108,7 +111,7 @@ export default{
                             this.postfixExp.push(item);
                         }  
                 }
-                else{ //遇到运算符
+                else{ //遇到运算符和左括号
                         if (this.tempExp.length == 0) {
                             this.tempExp.push(this.infixExp[i])
                         }
@@ -272,6 +275,7 @@ export default{
            console.log('主合取范式:'+this.hqfs) 
         },
         calculate:function(){           //合式公式开始计算
+           this.$options.methods.UIanimation.bind(this)()
            this.trueCombinedFormula = this.combinedFormula
            this.$options.methods.clear.bind(this)() 
            this.$options.methods.createTrueValue.bind(this)()             //bind(this)可以让this指针回顾正常
@@ -289,6 +293,7 @@ export default{
                    this.$options.methods.calculate.bind(this)()
             }
         },
+        /* 以下是ui美化 */
         UItransform:function(){      //为了迎合element的表格，修改数组结构
            var objArray = []
            var trueValue = this.trueValue
@@ -304,6 +309,16 @@ export default{
            }
            this.trueTableObj = objArray   
         },
+        UIanimation:function(){
+            var animation = uni.createAnimation({
+                duration: 600,
+                timingFunction: 'ease',
+            })
+            this.animationButton = animation
+
+            animation.rotate(360).step()         //uni-app的bug机制，动画只能实现一次（除非输入随机数）
+            this.animationButton = animation.export()
+        }
     }
 }
 </script>
@@ -324,6 +339,14 @@ export default{
  .checkbutton{
     float:right;
     margin-top:10upx;
+ }
+ .CFinput{
+    float:left;
+    width:88%;
+ }
+ .mybutton{
+    float:left;
+    margin-left:5upx;
  }
  .tips span{
    font-size:30upx;

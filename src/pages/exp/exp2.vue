@@ -1,66 +1,95 @@
 <template>
-  <el-table
-    :data="tableData"
-    style="width: 100%"
-    :row-class-name="tableRowClassName">
-    <el-table-column
-      prop="date"
-      label="日期"
-      width="100">
-    </el-table-column>
-    <el-table-column
-      prop="name"
-      label="姓名"
-      width="100">
-    </el-table-column>
-    <el-table-column
-      prop="address"
-      label="地址">
-    </el-table-column>
-  </el-table>
+  <view>
+     <!-- 进度框 -->
+    <view style="height:700upx; float:left; width:25%; margin-left:20upx; padding-top:20upx;">
+      <el-steps direction="vertical" :active="active" style=""> 
+        <el-step title="步骤 1" icon="el-icon-lollipop"></el-step>
+        <el-step title="步骤 2" description="两种输入方式都可以哦" icon="el-icon-cherry"></el-step>
+        <el-step title="步骤 3" description="我们是冠军(^o^)/~" icon="el-icon-trophy-1"></el-step>
+      </el-steps>
+    </view>
+    <!-- 操作界面 -->
+    <view class="operation">
+      <el-card class="box-card">
+        该集合的元素是:<el-input v-model="element" placeholder="hello" clearable prefix-icon="el-icon-edit" @keyup.enter.native="secondStepOperation"></el-input>
+      </el-card>
+      <el-card class="box-card" v-show="secondStep">
+         <el-tabs tab-position="top">
+            <el-tab-pane label="直接输入">
+              该集合的关系是:<el-input v-model="relation"  clearable prefix-icon="el-icon-edit"  @keyup.enter.native="thirdStepOperation"></el-input>
+            </el-tab-pane>
+            <el-tab-pane label="矩阵图">
+
+            </el-tab-pane>
+        </el-tabs>
+      </el-card>
+      <el-card class="box-card" v-show="thirdStep">
+        该集合的二元关系性质是:
+      </el-card>
+      <el-button type="danger" v-show="active >= 2" @tap="reset" size="small" round>重置</el-button>
+      <el-button type="primary" icon="el-icon-caret-right" circle @tap="nextStep" size="small"></el-button>
+    </view>
+  </view>
 </template>
 
-<style>
-  .el-table .warning-row {
-    background: oldlace;
+<style  lang="less" scoped>
+  .el-input{
+    width:55%;
+    margin-left:10upx;
   }
-
-  .el-table .success-row {
-    background: #f0f9eb;
+  .operation{
+      width:98%;
+      margin-top: 50upx;
+      .box-card{
+        height: 200upx;
+        margin-bottom:20upx;
+        font-size:25upx;
+        line-height:25upx;
+          &:nth-child(1){
+            height:150upx;
+          }
+          &:nth-child(2){
+            height:400upx;
+          }
+      }
+      .el-button{
+         float:right;
+         margin-right:10upx;
+      }
   }
 </style>
 
 <script>
   export default {
-    methods: {
-      tableRowClassName({row, rowIndex}) {
-        if (rowIndex === 1) {
-          return 'warning-row';
-        } else if (rowIndex === 3) {
-          return 'success-row';
-        }
-        return '';
-      }
-    },
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }]
+        element:'',  //集合的元素
+        relation:'', //集合的关系
+        active:0,   //当前进行到哪一步 0-2
+        secondStep: false,
+        thirdStep: false,
+      }
+    },
+    methods: {
+      nextStep:function(){
+        this.active++
+        if(this.active == 1) this.secondStep = true
+        if(this.active == 2) this.thirdStep = true
+      },
+      secondStepOperation:function(){
+        this.active = 1
+        this.secondStep = true
+      },
+      thirdStepOperation:function(){
+        this.active = 2
+        this.thirdStep = true
+      },
+      reset:function(){
+        if (this.active >= 2) this.active = 0
+        this.element = ''
+        this.relation = ''
+        this.secondStep = false
+        this.thirdStep = false
       }
     }
   }

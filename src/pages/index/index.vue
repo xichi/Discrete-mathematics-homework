@@ -75,11 +75,14 @@
 	   line-height:200upx;
 	   list-style:none;
 	   background-color:#f1f1f1;
-	   box-shadow: 0 0 3upx 0upx #b9b8b8 ;
+	   box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
 	   border-radius:50upx;
 	   color:#105e62;
 	   margin-bottom:20upx;
 	   padding-left:20upx;
+	   &:hover{
+       box-shadow:  0 2px 4px rgba(0, 0, 0, .23), 0 0 6px rgba(0, 0, 0, .23);
+	   }
 	   text{
 		   font-size:25upx;
 		   color:#428377; 
