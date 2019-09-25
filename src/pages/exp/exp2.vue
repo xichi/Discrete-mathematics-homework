@@ -13,7 +13,8 @@
       <el-card class="box-card">
         该集合的元素是:<el-input v-model="element" placeholder="hello" clearable prefix-icon="el-icon-edit" @keyup.enter.native="secondStepOperation"></el-input>
       </el-card>
-      <el-card class="box-card" v-show="secondStep">
+      <transition name="el-zoom-in-top">
+      <el-card class="box-card transition-box" v-show="secondStep">
          <el-tabs tab-position="top">
             <el-tab-pane label="直接输入">
               该集合的关系是:<el-input v-model="relation"  clearable prefix-icon="el-icon-edit"  @keyup.enter.native="thirdStepOperation"></el-input>
@@ -23,9 +24,12 @@
             </el-tab-pane>
         </el-tabs>
       </el-card>
-      <el-card class="box-card" v-show="thirdStep">
+      </transition>
+      <transition name="el-zoom-in-top">
+      <el-card class="box-card transition-box" v-show="thirdStep">
         该集合的二元关系性质是:
       </el-card>
+      </transition>
       <el-button type="danger" v-show="active >= 2" @tap="reset" size="small" round>重置</el-button>
       <el-button type="primary" icon="el-icon-caret-right" circle @tap="nextStep" size="small"></el-button>
     </view>
