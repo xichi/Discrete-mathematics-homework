@@ -23,7 +23,7 @@
                 <table class="relationMatrix">
                   <tbody>
                     <tr v-for="(i,index) in relationMatrix" :key="index">
-                      <td  v-for="(item,jndex) in i" :key="jndex" @click="relationMatrixChange(item,index,jndex)">
+                      <td  v-for="(item,jndex) in i" :key="jndex"   @tap="relationMatrixChange(item,index,jndex)">
                         {{item}}
                         <!-- <input type='text' placeholder="0"/> -->
                       </td>
@@ -124,23 +124,18 @@
       },
       /* 逻辑层 */
       createMatrixGraph:function(){        //统计集合的元素个数
-        this.relationMatrix = []
         let length = this.element
-        let item = []
-        item.length = length
+        let item = new Array()
         for(let i = 0; i < length; i++){
+          item[i]=new Array()
           for(let j = 0;j < length; j++){
-            item[j] = 0
+            item[i][j] = 0
           }
-           this.relationMatrix.push(item)
         }
+        this.relationMatrix = item
       },
       relationMatrixChange:function(item,index,jndex){
-        console.log(item,index,jndex)
-        //this.relationMatrix[1][jndex] = 5
         this.$set(this.relationMatrix[index],jndex,(1+item)%2)
-        //console.log(this.relationMatrix[index+1])
-        console.log(this.relationMatrix) 
       },
     }
   }
