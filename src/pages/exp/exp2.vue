@@ -16,9 +16,6 @@
       <transition name="el-zoom-in-top">
       <el-card class="box-card transition-box" v-show="secondStep">
          <el-tabs tab-position="top">
-            <el-tab-pane label="直接输入">
-              该集合的关系是:<el-input v-model="relation"  clearable prefix-icon="el-icon-edit"  @keyup.enter.native="thirdStepOperation"></el-input>
-            </el-tab-pane>
             <el-tab-pane label="矩阵图">
                 <table class="relationMatrix">
                   <tbody>
@@ -31,12 +28,16 @@
                   </tbody>
                 </table>
             </el-tab-pane>
+            <el-tab-pane label="直接输入">
+              该集合的关系是:<el-input v-model="relation"  clearable prefix-icon="el-icon-edit"  @keyup.enter.native="thirdStepOperation"></el-input>
+            </el-tab-pane>
         </el-tabs>
       </el-card>
       </transition>
       <transition name="el-zoom-in-top">
       <el-card class="box-card transition-box" v-show="thirdStep">
         该集合的二元关系性质是:
+        <view id="relation-nature-box"></view>
       </el-card>
       </transition>
       <el-button type="danger" v-show="active >= 2" @tap="reset" size="small" round>重置</el-button>
@@ -45,7 +46,7 @@
   </view>
 </template>
 
-<style  lang="less" scoped>
+<style lang="less" scoped>
   .el-input{
     width:55%;
     margin-left:10upx;
@@ -54,7 +55,7 @@
       width:98%;
       margin-top: 20px;
       .box-card{
-        height: 200px;
+        height: 100px;
         margin-bottom:5px;
         font-size:25upx;
         line-height:25upx;
@@ -92,6 +93,7 @@
         element:'',  //集合的元素
         relation:'', //集合的关系(直接输入)
         relationMatrix:[], //集合的关系(关系矩阵)
+        relationNature:{}, //集合关系的性质
         active:0,   //当前进行到哪一步 0-2
         secondStep: false,
         thirdStep: false,
@@ -103,7 +105,6 @@
         if(this.active == 0) this.$options.methods.secondStepOperation.bind(this)()
         else if(this.active == 1) this.$options.methods.thirdStepOperation.bind(this)()
         else if(this.active == 2) this.active++
-        //this.active++
       },
       secondStepOperation:function(){
         this.active = 1
@@ -113,6 +114,7 @@
       thirdStepOperation:function(){
         this.active = 2
         this.thirdStep = true
+        this.$options.methods.creatRelationNature.bind(this)(this.relationMatrix,this.relationNature)
       },
       reset:function(){
         if (this.active >= 2) this.active = 0
@@ -134,8 +136,71 @@
         }
         this.relationMatrix = item
       },
-      relationMatrixChange:function(item,index,jndex){
+      relationMatrixChange:function(item,index,jndex){   //矩阵关系
         this.$set(this.relationMatrix[index],jndex,(1+item)%2)
+      },
+      creatRelationNature:function(relationMatrix,relationNature){
+        let length = this.element
+        //对称性
+        let sym = true
+        for(let i = 0 ; i < length; ++i){
+          for(let j = 0; j < length; ++j){
+            if(relationMatrix[i][j] != relationMatrix[j][i]){  //只要有一对对称元素不相等：即不满足对称性
+              sym = false
+              break
+            }
+          }
+        }
+        relationNature['对称性'] = sym
+        //自反性
+        let ref = true
+        for(let i = 0; i < length; ++i){
+          if(relationMatrix[i][i] != 1){  //只要有一个对角线元素为 0：即不满足
+            ref = false
+            break
+          }
+        }
+        relationNature['自反性'] = ref
+       //反对称性
+        let anti_sym = true
+        for(let i = 0 ; i < length; ++i){
+          for(let j = 0; j < length; ++j){
+            if(relationMatrix[i][j] == relationMatrix[j][i]){  //只要有一对对称元素相等：即不满足反对称性
+              anti_sym = false
+              break
+            }
+          }
+        }
+        relationNature['反对称性'] = anti_sym
+      //反自反性
+        let anti_ref = true
+        for(let i = 0; i < length; ++i){
+          if(relationMatrix[i][i] == 1){  //只要有一个对角线元素为 1：即不满足
+            anti_ref = false
+            break
+          }
+        }
+        relationNature['反自反性'] = anti_ref
+      //传递性
+        let tra = true
+        for(let i = 0; i < length; ++i){
+          for(let j = 0; j < length; ++j){
+            for(let k = 0; k < length; ++k){
+              if(relationMatrix[i][j] && relationMatrix[j][k] && !relationMatrix[i][k]){  //前两个为 1，第三个为 0
+                tra = false
+                break
+              }
+            }
+          }
+        }
+        relationNature['传递性'] = tra
+        //console.log(relationNature)
+        let dom = document.getElementById('relation-nature-box')
+        dom.innerHTML = ''
+        for(let key  in relationNature){
+            if(relationNature[key]) dom.innerHTML += '<p style="text-indent:1em;">' + key + '</p>'
+        }
+        console.log(dom)
       },
     }
   }
