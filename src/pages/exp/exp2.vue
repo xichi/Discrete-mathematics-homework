@@ -29,7 +29,10 @@
                 </table>
             </el-tab-pane>
             <el-tab-pane label="直接输入">
-              该集合的关系是:<el-input v-model="relation"  clearable prefix-icon="el-icon-edit"  @keyup.enter.native="thirdStepOperation"></el-input>
+              该集合的关系是:
+              <el-tooltip class="item" effect="light" content="示例:<1,3>,<2,2>,<3,2>,..." placement="bottom-end">
+                <el-input v-model="relation" class="directInput" type="textarea" clearable @keyup.enter.native="thirdStepOperation"></el-input>
+             </el-tooltip>
             </el-tab-pane>
         </el-tabs>
       </el-card>
@@ -78,6 +81,9 @@
             }
           }
         }
+        .directInput{
+          margin-top:5px;
+        }
       }
       .el-button{
          float:right;
@@ -99,24 +105,45 @@
         thirdStep: false,
       }
     },
+    watch:{
+       relation(){                              //实现直接输入与矩阵关系图动态联动
+        if(window.lazy){                        //节流
+          window.clearTimeout(window.lazy)
+        }
+        window.lazy = window.setTimeout(()=>{
+          this.$options.methods.createMatrixGraph.bind(this)()
+          let relations = this.relation.concat(',').replace(/</g,'').split('>,')
+          for(let i=0;i<relations.length-1;i++){
+            relations[i] = relations[i].split(',')
+            this.$set(this.relationMatrix[relations[i][0]-1],relations[i][1]-1,1)
+          }
+          //console.log(this.relationMatrix)
+        },400)
+       }
+    },
     methods: {
       /* 界面UI */
-      nextStep:function(){
+      nextStep:function(){      //下一步
         if(this.active == 0) this.$options.methods.secondStepOperation.bind(this)()
         else if(this.active == 1) this.$options.methods.thirdStepOperation.bind(this)()
         else if(this.active == 2) this.active++
       },
-      secondStepOperation:function(){
+      secondStepOperation:function(){  //第二步
         this.active = 1
         this.secondStep = true
         this.$options.methods.createMatrixGraph.bind(this)()
+        this.$notify.info({
+          title: '提示',
+          message: '矩阵关系和直接输入已实现动态联动了哦~~',
+          duration: 5000
+        });
       },
-      thirdStepOperation:function(){
+      thirdStepOperation:function(){  //第三步
         this.active = 2
         this.thirdStep = true
         this.$options.methods.creatRelationNature.bind(this)(this.relationMatrix,this.relationNature)
       },
-      reset:function(){
+      reset:function(){      //重置
         if (this.active >= 2) this.active = 0
         this.element = ''
         this.relation = ''
@@ -125,7 +152,7 @@
         this.relationMatrix = []
       },
       /* 逻辑层 */
-      createMatrixGraph:function(){        //统计集合的元素个数
+      createMatrixGraph:function(){        //初始化矩阵关系
         let length = this.element
         let item = new Array()
         for(let i = 0; i < length; i++){
@@ -138,6 +165,15 @@
       },
       relationMatrixChange:function(item,index,jndex){   //矩阵关系
         this.$set(this.relationMatrix[index],jndex,(1+item)%2)
+        if(this.relationMatrix[index][jndex] == 1){      //实现矩阵关系图与直接输入动态联动
+          if(this.relation == '')  this.relation += '<' + (index+1) + ',' + (jndex+1) + '>'
+          else  this.relation += ',<' + (index+1) + ',' + (jndex+1) + '>'
+        }
+        else{
+          if(this.relation.length == 5)    this.relation = this.relation.replace('<'+(index+1)+','+(jndex+1)+'>','')
+          else  this.relation = this.relation.replace(',<'+(index+1)+','+(jndex+1)+'>','')
+        }
+
       },
       creatRelationNature:function(relationMatrix,relationNature){
         let length = this.element
@@ -200,7 +236,6 @@
         for(let key  in relationNature){
             if(relationNature[key]) dom.innerHTML += '<p style="text-indent:1em;">' + key + '</p>'
         }
-        console.log(dom)
       },
     }
   }
