@@ -49,6 +49,11 @@
   </view>
 </template>
 
+<style lang="less">
+  .el-tabs__content{
+      overflow-x: scroll !important;
+    }
+</style>
 <style lang="less" scoped>
   .el-input{
     width:55%;
@@ -62,7 +67,7 @@
         margin-bottom:5px;
         font-size:25upx;
         line-height:25upx;
-        overflow:scroll;
+        overflow:scroll scroll;
           &:nth-child(1){
             height:80px;
           }
@@ -70,6 +75,7 @@
             height:300px;
           }
         .relationMatrix{
+          overflow:scroll scroll;
           td{
             height:30px;
             width:30px;
@@ -198,11 +204,11 @@
         }
         relationNature['自反性'] = ref
        //反对称性
-        let anti_sym = true
+        let anti_sym = false
         for(let i = 0 ; i < length; ++i){
           for(let j = 0; j < length; ++j){
-            if(relationMatrix[i][j] == relationMatrix[j][i]){  //只要有一对对称元素相等：即不满足反对称性
-              anti_sym = false
+            if(relationMatrix[i][j] == relationMatrix[j][i] && i == j){  //只要有一对对称元素相等：即不满足反对称性
+              anti_sym = true
               break
             }
           }
@@ -222,7 +228,7 @@
         for(let i = 0; i < length; ++i){
           for(let j = 0; j < length; ++j){
             for(let k = 0; k < length; ++k){
-              if(relationMatrix[i][j] && relationMatrix[j][k] && !relationMatrix[i][k]){  //前两个为 1，第三个为 0
+              if(relationMatrix[i][j] && relationMatrix[j][k] && !relationMatrix[i][k]){  //前两个为 1，第三个为 0，则不具有传递性
                 tra = false
                 break
               }
@@ -234,7 +240,10 @@
         let dom = document.getElementById('relation-nature-box')
         dom.innerHTML = ''
         for(let key  in relationNature){
-            if(relationNature[key]) dom.innerHTML += '<p style="text-indent:1em;">' + key + '</p>'
+            if(relationNature[key]) 
+                dom.innerHTML += '<p style="text-indent:1em;">满足' + key + '</p>'
+            if(!relationNature[key])
+                dom.innerHTML += '<p style="text-indent:1em;">不满足' + key + '</p>'
         }
       },
     }
