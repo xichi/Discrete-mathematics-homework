@@ -140,7 +140,7 @@ export default {
   text-align: center;
   padding: 10upx 0;
   .inputBox-item {
-    width: 50%;
+    width: 80%;
   }
 }
 .outputBox {
